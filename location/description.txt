@@ -1,0 +1,10 @@
+Location dataset contains 446 binary features representing whether a user visited a certain region or location. The target attribute consists of 30 different geosocial types. The classification task is to predict a geosocial type for users based on their location data.
+
+
+https://www.spatial.ai/post/the-essential-guide-to-geosocial-data
+
+https://www.researchgate.net/publication/347150710_Geosocial_Location_Classification_Associating_Type_to_Places_Based_on_Geotagged_Social-Media_Posts
+
+https://www.europol.europa.eu/activities-services/public-awareness-and-prevention-guides/geosocial-networking-%E2%80%93-what-you-need-to-know
+
+https://www.yourdictionary.com/geosocial
