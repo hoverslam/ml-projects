@@ -126,3 +126,29 @@
 | none            |         5 | None                 |        nan        |
 | elasticnet      |         5 | balanced             |        nan        |
 | none            |         5 | balanced             |        nan        |
+
+
+# SGD
+
+| param_loss     | param_penalty   |   param_alpha |   mean_test_score |
+|:---------------|:----------------|--------------:|------------------:|
+| hinge          | elasticnet      |        0.01   |          0.96797  |
+| hinge          | l2              |        0.01   |          0.96797  |
+| modified_huber | elasticnet      |        0.0001 |          0.96797  |
+| squared_hinge  | l2              |        0.0001 |          0.967865 |
+| log            | l2              |        0.001  |          0.963425 |
+| squared_hinge  | l1              |        0.0001 |          0.963319 |
+| perceptron     | l2              |        0.0001 |          0.963319 |
+| perceptron     | elasticnet      |        0.0001 |          0.963214 |
+| log            | elasticnet      |        0.01   |          0.963214 |
+| modified_huber | l2              |        0.0001 |          0.963108 |
+| modified_huber | l1              |        0.01   |          0.958668 |
+| squared_hinge  | l2              |        0.001  |          0.958668 |
+| log            | l2              |        0.01   |          0.958668 |
+| perceptron     | l1              |        0.001  |          0.958668 |
+| hinge          | elasticnet      |        0.001  |          0.958668 |
+| modified_huber | elasticnet      |        0.01   |          0.958562 |
+| squared_hinge  | elasticnet      |        0.01   |          0.958457 |
+| hinge          | l2              |        0.0001 |          0.954228 |
+| hinge          | l1              |        0.01   |          0.954123 |
+| perceptron     | elasticnet      |        0.001  |          0.954123 |
