@@ -1,2 +1,3 @@
-# ml-projects
-Some smaller machine learning projects
+# Machine Learning
+
+Some smaller machine learning projects (Kaggle, ...) 
