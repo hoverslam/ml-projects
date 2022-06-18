@@ -1,73 +1,91 @@
+import gym
 import numpy as np
 import matplotlib.pyplot as plt
-import gym
-
 from tqdm import tqdm
 
 
-# Helper functions
-def get_state(observation):
-    states = []
-    for i in range(n_states):
-        states.append(np.digitize(observation[i], state_bins[i]))
+# Q-learning agent
+class MountainCarDriver():
+    
+    def __init__(self, alpha: float, gamma: float, epsilon: float, num_actions: int, num_bins: int):
+        self.alpha = alpha
+        self.gamma = gamma
+        self.epsilon = epsilon
+        self.num_actions = num_actions
+        self.num_bins = num_bins
         
-    return tuple(states)
-
-def policy(observation, epsilon):
-    if np.random.rand() < epsilon:
-        return np.random.randint(n_actions)
-    else:
-        return np.argmax(Q[get_state(observation)])
-
+        self.Q = np.zeros((num_bins, num_bins, num_actions))
+        self.bins = self.create_bins()        
+    
+    def update_table(self, reward: float, action: int, obs: list[float], new_obs: list[float]):
+        td_target = reward + self.gamma * np.max(self.Q[self.get_state(new_obs)])
+        td_error = td_target - self.Q[self.get_state(obs)][action]
+        self.Q[self.get_state(obs)][action] += self.alpha * td_error
+        
+    def create_bins(self):
+        return [
+            np.linspace(-1.2, 0.6, self.num_bins),      # Position
+            np.linspace(-0.07, 0.07, self.num_bins)     # Velocity
+        ]
+        
+    def get_state(self, obs: list[int]) -> tuple[int]:
+        states = []
+        for i in range(len(obs)):
+            states.append(np.digitize(obs[i], self.bins[i]))
+            
+        return tuple(states)
+        
+    def policy(self, obs: list[int]) -> int:
+        if np.random.rand() < self.epsilon:
+            return np.random.randint(self.num_actions)
+        else:
+            return np.argmax(self.Q[self.get_state(obs)])
+        
+    def save_table(self, file: str):
+        np.save(file, self.Q)
+        
+    def load_table(self, file: str):
+        self.Q = np.load(file)
+        
 
 # Settings
-BINS = 20
-ALPHA = 0.1  # learning rate
-GAMMA = 0.95  # discount rate
-EPSILON = 0.1
-EPISODES = 5000
-SHOW_EVERY = 10000
+EPISODES = 10000
+SHOW_EVERY = 1000
 
 
 # Initialize environment
 env = gym.make("MountainCar-v0")
-state_space_high = env.observation_space.high
-state_space_low = env.observation_space.low
-n_actions = env.action_space.n
-n_states = len(env.observation_space.low)
-
-Q = np.zeros((BINS, BINS, n_actions))
-history = {"episode": [], "reward" : []}
-
-state_bins = []
-for i in range(n_states):
-    state_bins.append(np.linspace(state_space_low[i], state_space_high[i], BINS))
-
-
+player = MountainCarDriver(alpha=0.1, gamma=0.99, epsilon=0.1, num_actions=3, num_bins=40)
+   
+                  
 # Training
+history = {"episode": [], "reward" : [], "average": []}
 for episode in tqdm(range(EPISODES)):
-    observation = env.reset()
+    obs = env.reset()
     done = False
     episode_reward = 0
     
     while not done:
-        action = policy(observation, EPSILON)
-        new_observation, reward, done, _ = env.step(action)
+        action = player.policy(obs)
+        new_obs, reward, done, _ = env.step(action)
+        new_obs = new_obs
         episode_reward += reward
         
-        td_target = reward + GAMMA * np.max(Q[get_state(new_observation)])
-        td_error = td_target - Q[get_state(observation)][action]
-        Q[get_state(observation)][action] += ALPHA * td_error
-        
-        observation = new_observation
+        player.update_table(reward, action, obs, new_obs)        
+        obs = new_obs
         
         if ((episode + 1) % SHOW_EVERY == 0):
             env.render()
     
     history["episode"].append(episode+1)
     history["reward"].append(episode_reward)
-            
+
 
 # Plot results
+w = int(EPISODES / 100)
+mov_avg = np.convolve(history["reward"], np.ones(w)/w, mode="valid")
 plt.scatter(history["episode"], history["reward"], s=1, alpha=0.5)
+plt.plot(history["episode"][:(-w+1)], mov_avg, color="red", alpha=0.7)
+plt.xlabel("Episode")
+plt.ylabel("Reward")
 plt.show()
