@@ -7,14 +7,16 @@ from tqdm import tqdm
 # Q-learning agent
 class MountainCarDriver():
     
-    def __init__(self, alpha: float, gamma: float, epsilon: float, num_actions: int, bin_size: int):
+    def __init__(self, alpha: float, gamma: float, epsilon: float, 
+                 num_actions: int, num_inputs: int, bin_size: int):
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
         self.num_actions = num_actions
+        self.num_inputs = num_inputs
         self.bin_size = bin_size
         
-        self.Q = np.zeros((bin_size, bin_size, num_actions))
+        self.Q = np.random.uniform(-1.0, 1.0, size=([bin_size] * num_inputs + [num_actions]))
         self.bins = self.create_bins()        
     
     def update_table(self, reward: float, action: int, obs: list[float], new_obs: list[float]):
@@ -55,7 +57,8 @@ SHOW_EVERY = 1000
 
 # Initialize environment
 env = gym.make("MountainCar-v0")
-player = MountainCarDriver(alpha=0.1, gamma=0.99, epsilon=0.1, num_actions=3, bin_size=40)
+player = MountainCarDriver(alpha=0.1, gamma=0.99, epsilon=0.1, 
+                           num_actions=3, num_inputs=2, bin_size=30)
    
                   
 # Training
