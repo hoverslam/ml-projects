@@ -52,8 +52,8 @@ class CartPolePlayer():
         
 
 # Settings
-EPISODES = 20000
-SHOW_EVERY = 5000
+EPISODES = 10000
+SHOW_EVERY = 1000
 
 
 # Initialize environment
@@ -63,7 +63,7 @@ player = CartPolePlayer(alpha=0.1, gamma=0.99, epsilon=0.1,
    
                   
 # Training
-history = {"episode": [], "reward" : [], "average": []}
+history = {"episode": [], "reward" : []}
 for episode in tqdm(range(EPISODES)):
     obs = env.reset()
     done = False
@@ -86,10 +86,11 @@ for episode in tqdm(range(EPISODES)):
 
 
 # Plot results
-w = int(EPISODES / 100)
-mov_avg = np.convolve(history["reward"], np.ones(w)/w, mode="valid")
+mov_avg = [np.average(history["reward"][:i+1]) for i in range(len(history["reward"]))]
+mov_avg_100 = mov_avg[:100] + [np.average(history["reward"][i:i+100]) for i in range(len(history["reward"])-100)]
+
 plt.scatter(history["episode"], history["reward"], s=1, alpha=0.5)
-plt.plot(history["episode"][:(-w+1)], mov_avg, color="red", alpha=0.7)
+plt.plot(history["episode"], mov_avg_100, color="red", alpha=0.7)
 plt.xlabel("Episode")
 plt.ylabel("Reward")
 plt.show()
