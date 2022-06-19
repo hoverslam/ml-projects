@@ -14,7 +14,7 @@ class QPlayer():
         
         self.bins = bins
         self.bin_size = bins[0].shape[0]
-        self.Q = np.random.uniform(-1.0, 1.0, size=([self.bin_size] * num_inputs + [num_actions]))              
+        self.Q = np.zeros(([self.bin_size] * num_inputs + [num_actions]), dtype=np.float32)              
     
     def update_table(self, reward: float, action: int, obs: list[float], new_obs: list[float]):
         td_target = reward + self.gamma * np.max(self.Q[self.get_state(new_obs)])
