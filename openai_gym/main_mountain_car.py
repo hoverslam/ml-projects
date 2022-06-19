@@ -13,7 +13,7 @@ if __name__ == "__main__":
             np.linspace(-0.07, 0.07, bin_size)     # Velocity
         ]
     q = QLearning("MountainCar-v0", parameter, bins)
-    q.train_agent(5000, 10000)
+    q.train_agent(5000, 1000)
     q.save(".work", "Q-MountainCar")    
     
     # TD(0) Actor-Critic

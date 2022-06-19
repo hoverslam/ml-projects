@@ -15,7 +15,7 @@ if __name__ == "__main__":
         np.linspace(-4.0, 4.0, bin_size)       # Pole Angular Velocity
     ]
     q = QLearning("CartPole-v1", parameter, bins)
-    q.train_agent(5000, 10000)
+    q.train_agent(5000, 1000)
     q.save(".work", "Q-CartPole")    
     
     # TD(0) Actor-Critic
