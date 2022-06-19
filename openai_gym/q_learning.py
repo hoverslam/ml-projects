@@ -112,7 +112,7 @@ class QLearning():
                 f.write(json.dumps(self.history))
                 f.close()
         
-    def loadt(self, filepath, filename, stats=True):                     
+    def load(self, filepath, filename, stats=True):                     
         self.agent.load_table(filepath, filename)
         
         if stats:
