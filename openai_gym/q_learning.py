@@ -7,8 +7,7 @@ from tqdm import tqdm
 
 class QPlayer():
     
-    def __init__(self, parameter: tuple[float], num_actions: int, num_inputs: int, bins: np.ndarray):
-        self.alpha, self.gamma, self.epsilon = parameter
+    def __init__(self, num_actions: int, num_inputs: int, bins: np.ndarray):
         self.num_actions = num_actions
         self.num_inputs = num_inputs
         
@@ -16,10 +15,11 @@ class QPlayer():
         self.bin_size = bins[0].shape[0]
         self.Q = np.zeros(([self.bin_size] * num_inputs + [num_actions]), dtype=np.float32)              
     
-    def update_table(self, reward: float, action: int, obs: list[float], new_obs: list[float]):
-        td_target = reward + self.gamma * np.max(self.Q[self.get_state(new_obs)])
+    def update_table(self, reward: float, action: int, obs: list[float], new_obs: list[float],
+                     gamma: float, alpha: float):
+        td_target = reward + gamma * np.max(self.Q[self.get_state(new_obs)])
         td_error = td_target - self.Q[self.get_state(obs)][action]
-        self.Q[self.get_state(obs)][action] += self.alpha * td_error
+        self.Q[self.get_state(obs)][action] += alpha * td_error
 
     def get_state(self, obs: list[int]) -> tuple[int]:
         states = []
@@ -28,8 +28,8 @@ class QPlayer():
             
         return tuple(states)
         
-    def policy(self, obs: list[int]) -> int:
-        if np.random.rand() < self.epsilon:
+    def policy(self, obs: list[int], epsilon: float) -> int:
+        if np.random.rand() < epsilon:
             return np.random.randint(self.num_actions)
         else:
             return np.argmax(self.Q[self.get_state(obs)])
@@ -50,24 +50,28 @@ class QLearning():
         self.num_inputs = len(self.env.observation_space.high)              
         
         # Agent
-        self.agent = QPlayer(parameter, self.num_actions, self.num_inputs, bins)
+        self.gamma, self.alpha, self.epsilon = parameter
+        self.agent = QPlayer(self.num_actions, self.num_inputs, bins)
         
         # Stats
         self.history = {"episode": [], "reward": []}
 
     def train_agent(self, num_episodes: int, show_every: int) -> None:
+        epsilons = self.decay_schedule(self.epsilon[0], self.epsilon[1], 0.5, num_episodes)
+        alphas = self.decay_schedule(self.alpha[0], self.alpha[1], 0.5, num_episodes)
+        
         for episode in tqdm(range(num_episodes)):
             obs = self.env.reset()
             done = False
             episode_reward = 0
                 
             while not done:
-                action = self.agent.policy(obs)
+                action = self.agent.policy(obs, epsilons[episode])
                 new_obs, reward, done, _ = self.env.step(action)
                 new_obs = new_obs
                 episode_reward += reward
                 
-                self.agent.update_table(reward, action, obs, new_obs)        
+                self.agent.update_table(reward, action, obs, new_obs, self.gamma, alphas[episode])        
                 obs = new_obs
                 
                 if ((episode + 1) % show_every == 0):
@@ -83,7 +87,7 @@ class QLearning():
             episode_reward = 0
             
             while not done:
-                action = self.agent.policy(obs)
+                action = self.agent.policy(obs, 0)
                 obs, reward, done, _ = self.env.step(action)
                 episode_reward += reward
                     
@@ -118,3 +122,14 @@ class QLearning():
         if stats:
             src = "{}/{}".format(filepath, filename)
             self.history = json.load(open("{}_stats.json".format(src)))
+            
+    def decay_schedule(self, init_value, min_value, decay_ratio, max_steps):
+        decay_steps = int(max_steps * decay_ratio)
+        rem_steps = max_steps - decay_steps
+        
+        values = np.logspace(-2, 0, decay_steps, base=10, endpoint=True)[::-1]
+        values = (values - values.min()) / (values.max() - values.min())
+        values = (init_value - min_value) * values + min_value
+        values = np.pad(values, (0, rem_steps), "edge")
+        
+        return values
