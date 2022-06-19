@@ -16,14 +16,16 @@ if __name__ == "__main__":
     ]
     q = QLearning("CartPole-v1", parameter, bins)
     q.train_agent(5000, 1000)
-    q.save(".work", "Q-CartPole")
-    q.plot_performance()
+    q.save(".work", "Q-CartPole")    
     
     # TD(0) Actor-Critic
     actor = (64, 64, 0.0001)    # Units for layer1, layer2, learning rate
     critic = (64, 64, 0.0005)   # Units for layer1, layer2, learning rate
     ac = TD0ActorCritic("CartPole-v1", actor, critic)
     ac.train_agent(5000, 1000)
-    ac.save(".work", "AC-CartPole")
-    ac.plot_performance()        
+    ac.save(".work", "AC-CartPole")    
+    
+    # Performance
+    q.plot_performance()
+    ac.plot_performance()
     
