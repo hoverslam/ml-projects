@@ -11,8 +11,8 @@ if __name__ == "__main__":
             np.linspace(-1.2, 0.6, bin_size),      # Position
             np.linspace(-0.07, 0.07, bin_size)     # Velocity
         ]
-    game = QLearning("MountainCar-v0", parameter, bins)
-    game.train_agent(5000, 1000)
-    game.save(".work", "Q-MountainCar")
-    game.plot_performance()
+    q = QLearning("MountainCar-v0", parameter, bins)
+    q.train_agent(5000, 1000)
+    q.save(".work", "Q-MountainCar")
+    q.plot_performance()
     

@@ -13,8 +13,8 @@ if __name__ == "__main__":
         np.linspace(-0.418, 0.418, bin_size),  # Pole Angle
         np.linspace(-4.0, 4.0, bin_size)       # Pole Angular Velocity
     ]
-    game = QLearning("CartPole-v1", parameter, bins)
-    game.train_agent(5000, 1000)
-    game.save(".work", "Q-CartPole")
-    game.plot_performance()    
+    q = QLearning("CartPole-v1", parameter, bins)
+    q.train_agent(5000, 1000)
+    q.save(".work", "Q-CartPole")
+    q.plot_performance()    
     
