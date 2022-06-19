@@ -5,31 +5,22 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 
-class MountainCarDriver():
+class QPlayer():
     
-    def __init__(self, alpha: float, gamma: float, epsilon: float, 
-                 num_actions: int, num_inputs: int, bin_size: int):
-        self.alpha = alpha
-        self.gamma = gamma
-        self.epsilon = epsilon
+    def __init__(self, parameter: tuple[float], num_actions: int, num_inputs: int, bins: np.ndarray):
+        self.alpha, self.gamma, self.epsilon = parameter
         self.num_actions = num_actions
         self.num_inputs = num_inputs
-        self.bin_size = bin_size
         
-        self.Q = np.random.uniform(-1.0, 1.0, size=([bin_size] * num_inputs + [num_actions]))
-        self.bins = self.create_bins()        
+        self.bins = bins
+        self.bin_size = bins[0].shape[0]
+        self.Q = np.random.uniform(-1.0, 1.0, size=([self.bin_size] * num_inputs + [num_actions]))              
     
     def update_table(self, reward: float, action: int, obs: list[float], new_obs: list[float]):
         td_target = reward + self.gamma * np.max(self.Q[self.get_state(new_obs)])
         td_error = td_target - self.Q[self.get_state(obs)][action]
         self.Q[self.get_state(obs)][action] += self.alpha * td_error
-        
-    def create_bins(self):
-        return [
-            np.linspace(-1.2, 0.6, self.bin_size),      # Position
-            np.linspace(-0.07, 0.07, self.bin_size)     # Velocity
-        ]
-        
+
     def get_state(self, obs: list[int]) -> tuple[int]:
         states = []
         for i in range(len(obs)):
@@ -44,24 +35,22 @@ class MountainCarDriver():
             return np.argmax(self.Q[self.get_state(obs)])
         
     def save_table(self, filepath: str, filename: str):
-        np.save("{}/{}".format(filepath, filename), self.Q)
+        np.save("{}/{}_model".format(filepath, filename), self.Q)
         
     def load_table(self, filepath:str, filename: str):
-        self.Q = np.load("{}/{}.npy".format(filepath, filename))
+        self.Q = np.load("{}/{}_model.npy".format(filepath, filename))
     
 
-class GymMountainCar():
+class QLearning():
     
-    def __init__(self) -> None:
-        # Initialize environment
-        self.env = gym.make("MountainCar-v0")
-        self.num_actions = 3
-        self.num_inputs = 2
+    def __init__(self, env_name: str, parameter: tuple[float], bins: np.ndarray) -> None:
+        # Environment
+        self.env = gym.make(env_name)
+        self.num_actions = self.env.action_space.n
+        self.num_inputs = len(self.env.observation_space.high)              
         
-        
-        # Initialize agent
-        self.agent = MountainCarDriver(alpha=0.1, gamma=0.95, epsilon=0.1, bin_size=30, 
-                                       num_actions=self.num_actions, num_inputs=self.num_inputs)
+        # Agent
+        self.agent = QPlayer(parameter, self.num_actions, self.num_inputs, bins)
         
         # Stats
         self.history = {"episode": [], "reward": []}
@@ -114,24 +103,18 @@ class GymMountainCar():
         plt.ylabel("Reward")
         plt.show()
 
-    def save_agent(self, filepath, filename, stats=True):
-        self.agent.save_table(filepath, filename)
+    def save(self, filepath, filename, stats=True):             
+        self.agent.save_table(filepath, filename)  
+              
         if stats:
-            src = "{}/{}".format(filepath, filename)
+            src = "{}/{}".format(filepath, filename)               
             with open("{}_stats.json".format(src), "w") as f:
                 f.write(json.dumps(self.history))
                 f.close()
         
-    def load_agent(self, filepath, filename, stats=True):        
+    def loadt(self, filepath, filename, stats=True):                     
         self.agent.load_table(filepath, filename)
+        
         if stats:
             src = "{}/{}".format(filepath, filename)
             self.history = json.load(open("{}_stats.json".format(src)))
-
-
-if __name__ == "__main__":
-    g = GymMountainCar()
-    g.train_agent(5000, 1000)
-    g.save_agent("mountain_car", "q_temp")
-    g.plot_performance()
-    
