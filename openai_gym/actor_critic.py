@@ -61,10 +61,10 @@ class TD0ActorCritic():
                     episode_reward += reward
                     
                     next_state_value = self.critic(tf.convert_to_tensor([next_obs]))
-                    delta = reward + self.gamma * next_state_value - state_value * (not done)
+                    error = (reward + self.gamma * next_state_value - state_value) * (not done)
 
-                    actor_loss = delta * tf.math.log(action_prob)
-                    critic_loss = delta * state_value
+                    actor_loss = error * tf.math.log(action_prob)
+                    critic_loss = error * state_value
                     
                     actor_grads = tape_actor.gradient(actor_loss, self.actor.trainable_variables)
                     critic_grads = tape_critic.gradient(-critic_loss, self.critic.trainable_variables)

@@ -24,7 +24,7 @@ class QPlayer():
     def get_state(self, obs: list[int]) -> tuple[int]:
         states = []
         for i in range(len(obs)):
-            states.append(np.digitize(obs[i], self.bins[i]))
+            states.append(np.digitize(obs[i], self.bins[i], right=True))
             
         return tuple(states)
         
@@ -55,11 +55,11 @@ class QLearning():
 
     def train_agent(self, num_episodes: int, show_every: int) -> None:
         self.agent = QPlayer(self.num_actions, self.num_inputs, self.bins)
-        epsilons = self.decay_schedule(self.epsilon[0], self.epsilon[1], 0.5, num_episodes)
-        alphas = self.decay_schedule(self.alpha[0], self.alpha[1], 0.5, num_episodes)
-        
         self.history = {"episode": [], "reward": []}
         
+        epsilons = self.decay_schedule(self.epsilon[0], self.epsilon[1], 0.5, num_episodes)
+        alphas = self.decay_schedule(self.alpha[0], self.alpha[1], 0.5, num_episodes)
+                
         for episode in tqdm(range(num_episodes)):
             obs = self.env.reset()
             done = False
