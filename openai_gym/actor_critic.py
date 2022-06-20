@@ -16,32 +16,29 @@ class TD0ActorCritic():
         self.num_inputs = len(self.env.observation_space.high)
         
         # Agent
-        self.actor_l1, self.actor_l2, self.actor_lr = actor
-        self.critic_l1, self.critic_l2, self.critic_lr = critic
+        self.actor_layer, self.actor_lr = actor
+        self.critic_layer, self.critic_lr = critic
         self.gamma = gamma
         self.actor, self.critic = self.build_agent()
         self.optimizer_actor = keras.optimizers.Adam(learning_rate=self.actor_lr)
         self.optimizer_critic = keras.optimizers.Adam(learning_rate=self.critic_lr)
-        
-        # Stats
-        self.history = {"episode": [], "reward": []}
-        
+
     def build_agent(self):
-        actor = keras.Sequential([
-            keras.layers.Dense(self.actor_l1, activation="relu"),
-            keras.layers.Dense(self.actor_l2, activation="relu"),
-            keras.layers.Dense(self.num_actions, activation="softmax")
-        ])
+        actor = keras.Sequential()
+        for units in self.actor_layer:
+            actor.add(keras.layers.Dense(units, activation="relu"))
+        actor.add(keras.layers.Dense(self.num_actions, activation="softmax"))
         
-        critic = keras.Sequential([
-            keras.layers.Dense(self.critic_l1, activation="relu"),
-            keras.layers.Dense(self.critic_l2, activation="relu"),
-            keras.layers.Dense(1)
-        ])
+        critic = keras.Sequential()
+        for units in self.critic_layer:
+            critic.add(keras.layers.Dense(units, activation="relu"))
+        critic.add(keras.layers.Dense(1))
         
         return actor, critic
 
     def train_agent(self, num_episodes: int, show_every: int) -> None:
+        self.history = {"episode": [], "reward": []}
+        
         for episode in tqdm(range(num_episodes)):
             obs = self.env.reset()
             done = False
@@ -61,13 +58,14 @@ class TD0ActorCritic():
                     episode_reward += reward
                     
                     next_state_value = self.critic(tf.convert_to_tensor([next_obs]))
-                    error = (reward + self.gamma * next_state_value - state_value) * (not done)
+                    td_target = reward + self.gamma * next_state_value * (not done)
+                    td_error = td_target - state_value
 
-                    actor_loss = error * tf.math.log(action_prob)
-                    critic_loss = error * state_value
+                    actor_loss = -tf.math.log(action_prob) * td_error
+                    critic_loss = td_error ** 2
                     
                     actor_grads = tape_actor.gradient(actor_loss, self.actor.trainable_variables)
-                    critic_grads = tape_critic.gradient(-critic_loss, self.critic.trainable_variables)
+                    critic_grads = tape_critic.gradient(critic_loss, self.critic.trainable_variables)
         
                     self.optimizer_actor.apply_gradients(zip(actor_grads, self.actor.trainable_variables))
                     self.optimizer_critic.apply_gradients(zip(critic_grads, self.critic.trainable_variables))
