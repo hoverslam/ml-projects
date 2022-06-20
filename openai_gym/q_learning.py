@@ -101,8 +101,9 @@ class QLearning():
         mov_avg = [np.average(rewards[:i+1]) for i in range(len(rewards))]
         mov_avg_100 = mov_avg[:100] + [np.average(rewards[i:i+100]) for i in range(len(rewards)-100)]
 
-        plt.scatter(self.history["episode"], rewards, s=1, alpha=0.5)
-        plt.plot(self.history["episode"], mov_avg_100, color="red", alpha=0.7)
+        plt.figure(dpi=120)
+        plt.scatter(self.history["episode"], rewards, s=1, alpha=0.25)
+        plt.plot(self.history["episode"], mov_avg_100, color="red", alpha=0.75)
         plt.xlabel("Episode")
         plt.ylabel("Reward")
         plt.title("{}: Q-Learning".format(self.env.unwrapped.spec.id))
