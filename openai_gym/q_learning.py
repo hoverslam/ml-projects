@@ -47,18 +47,18 @@ class QLearning():
         # Environment
         self.env = gym.make(env_name)
         self.num_actions = self.env.action_space.n
-        self.num_inputs = len(self.env.observation_space.high)              
+        self.num_inputs = len(self.env.observation_space.high)  
         
-        # Agent
+        # Agent            
         self.gamma, self.alpha, self.epsilon = parameter
-        self.agent = QPlayer(self.num_actions, self.num_inputs, bins)
-        
-        # Stats
-        self.history = {"episode": [], "reward": []}
+        self.bins = bins
 
     def train_agent(self, num_episodes: int, show_every: int) -> None:
+        self.agent = QPlayer(self.num_actions, self.num_inputs, self.bins)
         epsilons = self.decay_schedule(self.epsilon[0], self.epsilon[1], 0.5, num_episodes)
         alphas = self.decay_schedule(self.alpha[0], self.alpha[1], 0.5, num_episodes)
+        
+        self.history = {"episode": [], "reward": []}
         
         for episode in tqdm(range(num_episodes)):
             obs = self.env.reset()
@@ -117,7 +117,8 @@ class QLearning():
                 f.write(json.dumps(self.history))
                 f.close()
         
-    def load(self, filepath, filename, stats=True):                     
+    def load(self, filepath, filename, stats=True):
+        self.agent = QPlayer(self.num_actions, self.num_inputs, self.bins)                     
         self.agent.load_table(filepath, filename)
         
         if stats:
