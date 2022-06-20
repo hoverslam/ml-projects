@@ -110,8 +110,7 @@ class TD0ActorCritic():
         plt.plot(self.history["episode"], mov_avg_100, color="red", alpha=0.75)
         plt.xlabel("Episode")
         plt.ylabel("Reward")
-        plt.title("{}: TD(0) Actor-Critic".format(self.env.unwrapped.spec.id))
-        
+        plt.title("{}: TD(0) Actor-Critic".format(self.env.unwrapped.spec.id))        
         plt.show()
 
     def save(self, filepath, filename, stats=True):
