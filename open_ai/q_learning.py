@@ -109,22 +109,22 @@ class QLearning():
         plt.title("{}: Q-Learning".format(self.env.unwrapped.spec.id))
         plt.show()
 
-    def save(self, filepath, filename, stats=True):             
+    def save_model(self, filepath, filename):             
         self.agent.save_table(filepath, filename)  
-              
-        if stats:
-            src = "{}/{}".format(filepath, filename)               
-            with open("{}_stats.json".format(src), "w") as f:
-                f.write(json.dumps(self.history))
-                f.close()
         
-    def load(self, filepath, filename, stats=True):
+    def load_model(self, filepath, filename):
         self.agent = QPlayer(self.num_actions, self.num_inputs, self.bins)                     
         self.agent.load_table(filepath, filename)
-        
-        if stats:
-            src = "{}/{}".format(filepath, filename)
-            self.history = json.load(open("{}_stats.json".format(src)))
+            
+    def save_stats(self, filepath, filename):
+        src = "{}/{}".format(filepath, filename)               
+        with open("{}_stats.json".format(src), "w") as f:
+            f.write(json.dumps(self.history))
+            f.close()
+            
+    def load_stats(self, filepath, filename):
+        src = "{}/{}".format(filepath, filename)
+        self.history = json.load(open("{}_stats.json".format(src)))
             
     def decay_schedule(self, init_value, min_value, decay_ratio, max_steps):
         decay_steps = int(max_steps * decay_ratio)
@@ -136,3 +136,4 @@ class QLearning():
         values = np.pad(values, (0, rem_steps), "edge")
         
         return values
+    

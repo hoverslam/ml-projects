@@ -78,7 +78,7 @@ class TD0ActorCritic():
             self.history["episode"].append(episode+1)
             self.history["reward"].append(episode_reward)
             
-    def play(self, num_episodes, show=True):
+    def play(self, num_episodes):
         for episode in range(num_episodes):
             obs = self.env.reset()
             done = False
@@ -92,9 +92,8 @@ class TD0ActorCritic():
 
                 obs, reward, done, _ = self.env.step(action)
                 episode_reward += reward
-                    
-                if show:
-                    self.env.render()
+
+                self.env.render()
                     
             print("Reward: {:.2f} at episode {}".format(episode_reward, episode+1))
                     
@@ -111,18 +110,20 @@ class TD0ActorCritic():
         plt.title("{}: TD(0) Actor-Critic".format(self.env.unwrapped.spec.id))        
         plt.show()
 
-    def save(self, filepath, filename, stats=True):
+    def save_model(self, filepath, filename):
         src = "{}/{}".format(filepath, filename)
         self.actor.save("{}_model.h5".format(src))
         
-        if stats:
-            with open("{}_stats.json".format(src), "w") as f:
-                f.write(json.dumps(self.history))
-                f.close()
-        
-    def load(self, filepath, filename, stats=True):
+    def load_model(self, filepath, filename):
         src = "{}/{}".format(filepath, filename)
         self.actor = keras.models.load_model("{}_model.h5".format(src))
-        
-        if stats:
-            self.history = json.load(open("{}_stats.json".format(src)))
+   
+    def save_stats(self, filepath, filename):
+        src = "{}/{}".format(filepath, filename)
+        with open("{}_stats.json".format(src), "w") as f:
+            f.write(json.dumps(self.history))
+            f.close()
+            
+    def load_stats(self, filepath, filename):
+        src = "{}/{}".format(filepath, filename)
+        self.history = json.load(open("{}_stats.json".format(src)))
