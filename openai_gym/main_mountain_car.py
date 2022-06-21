@@ -17,10 +17,11 @@ if __name__ == "__main__":
     q.save(".work", "Q-MountainCar")    
     
     # TD(0) Actor-Critic
-    actor = (32, 32, 0.0001)    # Units for layer1, layer2, learning rate
-    critic = (64, 64, 0.0005)   # Units for layer1, layer2, learning rate
+    # ! Doesn't train => car stays in the valley all the time
+    actor = ([64, 32], 0.001)    # Units for layer1, layer2, learning rate
+    critic = ([64, 64], 0.005)   # Units for layer1, layer2, learning rate
     ac = TD0ActorCritic("MountainCar-v0", actor, critic)
-    ac.train_agent(5000, 1000)
+    ac.train_agent(500, 50)
     ac.save(".work", "AC-MountainCar")
     
     # Performance

@@ -15,14 +15,14 @@ if __name__ == "__main__":
         np.linspace(-4.0, 4.0, bin_size)       # Pole Angular Velocity
     ]
     q = QLearning("CartPole-v1", parameter, bins)
-    q.train_agent(5000, 1000)
+    q.train_agent(20000, 4000)
     q.save(".work", "Q-CartPole")   
     
     # TD(0) Actor-Critic
-    actor = (256, 128, 0.0001)    # Units for layer1, layer2, learning rate
-    critic = (256, 128, 0.0003)   # Units for layer1, layer2, learning rate
+    actor = ([128, 32], 0.0001)   # Units per layer, learning rate for actor
+    critic = ([128, 64], 0.0005)  # Units per layer, learning rate for critic
     ac = TD0ActorCritic("CartPole-v1", actor, critic)
-    ac.train_agent(1000, 100)
+    ac.train_agent(500, 100)
     ac.save(".work", "AC-CartPole")
     
     # Performance
