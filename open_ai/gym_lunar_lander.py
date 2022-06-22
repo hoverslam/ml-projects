@@ -27,8 +27,8 @@ def performance(method: str):
 def build_agent(method: str):
     match method:
         case "Actor-Critic":
-            actor = ([1028, 512], 0.0001)   # Units per layer, learning rate for actor
-            critic = ([1028, 512], 0.0005)  # Units per layer, learning rate for critic
+            actor = ([1028, 512], 0.00004)   # Units per layer, learning rate for actor
+            critic = ([1028, 512], 0.00006)  # Units per layer, learning rate for critic
             return (TD0ActorCritic("LunarLander-v2", actor, critic), "AC-LunarLander")
         case _:
             raise ValueError("No such method found!")       
