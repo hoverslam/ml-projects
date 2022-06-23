@@ -38,8 +38,8 @@ def build_agent(method: str):
             ]
             return (QLearning("CartPole-v1", parameter, bins), "Q-CartPole")
         case "Actor-Critic":
-            actor = ([128, 64], 0.0001)   # Units per layer, learning rate for actor
-            critic = ([128, 64], 0.0005)  # Units per layer, learning rate for critic
+            actor = ([32, 32], 0.0002)   # Units per layer, learning rate for actor
+            critic = ([32, 32], 0.0004)  # Units per layer, learning rate for critic
             return (TD0ActorCritic("CartPole-v1", actor, critic), "AC-CartPole")
         case _:
             raise ValueError("No such method found!")       
