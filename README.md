@@ -1,6 +1,6 @@
 # Machine Learning
 
-A gathering place for some smaller machine learning projects that do not "deserve" their own repository.
+A gathering place for smaller machine learning projects that do not "deserve" their own repository.
 
 
 ## Kaggle competitions
