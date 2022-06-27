@@ -12,7 +12,7 @@ A gathering place for smaller machine learning projects that do not "deserve" th
 * **Congressional Voting**: Predict the party of a congress member based on their voting behavior on different topics.
 
 
-## Musing on data sets
+## Musing on data
 
 * **Iris**
 
