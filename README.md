@@ -14,7 +14,7 @@ A gathering place for smaller machine learning projects that do not "deserve" th
 
 ## Musing on data
 
-* **Iris**
+
 
 
 ## OpenAI Gym
