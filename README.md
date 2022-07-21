@@ -14,7 +14,7 @@ A gathering place for smaller machine learning projects that do not "deserve" th
 
 ## Musing on data
 
-
+* **Data Science skills**: What are the most requested skills for a data scientist according to the job market?
 
 
 ## OpenAI Gym
